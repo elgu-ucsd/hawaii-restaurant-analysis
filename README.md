@@ -201,19 +201,19 @@ This feature represents how many reviews a restaurant has received. A larger rev
 This feature indicates whether the restaurant name contains a Hawaiian word. Since the analysis focuses on naming patterns in Hawaii, this variable captures a locally relevant aspect of restaurant identity that may be associated with how the restaurant is positioned and perceived by customers.
 
 `has_cuisine_word`
-This feature indicates whether a restaurant name contains a cuisine-related word, such as "Thai" or "Hawaiian", both of which appear among the top 20 most common words in the univariate analysis. Cuisine can shape expectations around food, pricing, and a more stylized or personal dining environment, which may influence how customers evaluate and rate a restaurant.
+This feature indicates whether a restaurant name contains a cuisine-related word, such as "Thai" or "Hawaiian", both of which appear among the top 20 most common words in the univariate analysis. Cuisine can shape expectations around food, pricing, and a more stylized dining environment, which may influence how customers evaluate and rate a restaurant.
 
 `is_fast_food` and `is_fine_dining`
-These two features were derived from the `category` column in the original dataset using **one-hot encoding** to indicate whether a business is classified as a "Fast Food Restaurant" or "Fine Dining Restaurant". This helps distinguish restaurants with different dining styles, service expectations, and price ranges, which may shape customer experiences and therefore ratings. 
+These two features were derived from the `category` column in the original dataset as **binary indicators** of whether a business is classified as a "Fast Food Restaurant" or "Fine Dining Restaurant". This helps distinguish restaurants with different dining styles, service expectations, and price ranges, which may shape customer experiences and therefore ratings. 
 
 `price_fast_food` and `price_fine_dining`
-These two engineered **interaction terms** combine price level with restaurant type. This is useful because fine dining and fast food operate within very different price ranges, so the same price level may carry a different meaning depending on the type of restaurant. Separating these relationships helps the model interpret price within the appropriate dining context.
+These two engineered **interaction terms** combine price level with restaurant type. This is useful because fine dining and fast food operate within very different price ranges, so the same price level may carry a different meaning depending on the type of restaurant. Although Random Forest can learn interactions on its own, explicitly including these terms gives the model direct information about price within each dining context.
 
 `category_count`
 This feature represents the number of categories assigned to a restaurant on Google Maps. Restaurants with more categories may offer a broader range of services or fall into multiple dining classifications. For instance, a less specialized restaurant may be represented by several categories rather than one specific type, giving the model additional context. 
 
 ### Model and Hyperparameter Selection
-The final model uses a **Random Forest Regressor** instead of linear regression. Linear regression assumes that the relationship between each feature and average rating is approximately linear, which may be too restrictive for this data. Random Forest was chosen because it can capture nonlinear relationships and interactions between features without requiring them to be specified manually. 
+The final model uses a **Random Forest Regressor** instead of linear regression. Linear regression assumes that the relationship between each feature and average rating is approximately linear, which may be too restrictive for this data. Random Forest was chosen because it can capture nonlinear relationships and interactions between features, allowing it to learn more complex patterns in the data.
 
 `GridSearchCV` was used to select the hyperparameters `max_depth` and `min_samples_leaf`. `max_depth` controls how complex each decision tree can be, while `min_samples_leaf` controls the minimum number of observations required in each leaf, helping prevent the model from fitting overly specific patterns.
 
@@ -224,7 +224,7 @@ The final model uses a **Random Forest Regressor** instead of linear regression.
 
 These ranges were refined through several trials. Broader ranges were initially tested, then narrowed around the values that performed best to compare nearby values more closely. `GridSearchCV` then evaluated each combination using cross-validation and selected the parameters with the lowest RMSE.
 
-> Best Performing Parameteres
+> Best Performing Parameters
 
 `max_depth` = 6  
 `min_samples_leaf` = 8
