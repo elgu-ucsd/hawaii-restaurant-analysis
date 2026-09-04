@@ -5,7 +5,7 @@ The dataset contains Google Maps information for various locations in Hawaii. Th
 
 **Research Question:** Do certain naming features of Hawaii restaurants correlate with higher price levels and average ratings?
 
-This question is relevant because restaurant names are intentional and important to how businesses reflect their style and identity. Understanding whether these naming choices relate to customer ratings or price can reveal patterns in how restaurants are presented and perceived. 
+This question is relevant because restaurant names are intentional and play an important role in how businesses reflect their style and identity. Understanding whether these naming choices relate to customer ratings or price can reveal patterns in how restaurants are presented and perceived. 
 
 The following dataset was originally scraped and used in the research papers [UCTopic: Unsupervised Contrastive Learning for Phrase Representations and Topic Mining](https://aclanthology.org/2022.acl-long.426.pdf) and [Personalized Showcases: Generating Multi-Modal Explanations for Recommendations](https://arxiv.org/pdf/2207.00422).
 
@@ -43,7 +43,7 @@ The following dataset was originally scraped and used in the research papers [UC
 6. Create groups of naming features
     - Words were grouped into categories including food, cuisine, dining type, Hawaiian words, descriptive words, and person names. These groups make it easier to compare variables across broader naming patterns rather than individual words.
 7. Add boolean columns for each naming feature
-    - The columns `has_food_word`, `has_cuisine_word`. `has_dining_type_word`, `has_hawaiian_word`, `has_descriptive_word`, and `has_person_name` were added to indicate whether a restaurant name contains a word from each category. 
+    - The columns `has_food_word`, `has_cuisine_word`, `has_dining_type_word`, `has_hawaiian_word`, `has_descriptive_word`, and `has_person_name` were added to indicate whether a restaurant name contains a word from each category. 
 
 The cleaned dataset contains 4,301 rows and 14 columns. The following is the output of the first 5 rows:
 
@@ -65,7 +65,7 @@ The distribution of the most common words in restaurant names shows that terms s
   frameborder="0">
 </iframe>
 
-The distribution of word types in restaurant names shows `has_food_word` and `has_dining_type_word` are the  most common naming features. However, it is important to note that because these categories are manually defined, this plot should be interpreted broadly and only as a general classification of naming patterns rather than a precise or exhaustive measure.
+The distribution of word types in restaurant names shows that `has_food_word` and `has_dining_type_word` are the most common naming features. However, it is important to note that because these categories are manually defined, this plot should be interpreted broadly and only as a general classification of naming patterns rather than a precise or exhaustive measure.
 
 <iframe
   src="assets/univariate_distribution_of_word_types.html"
@@ -84,7 +84,7 @@ From this scatter plot, it can be interpreted that most restaurants have average
   frameborder="0">
 </iframe>
 
-The box plot shows that higher price levels are generally associated with higher average ratings. Higher-priced restaurants appear to have more concentrated ratings than lower-priced restaurants, although it should be considered that there are fewer restaurants at the higher price levels.
+The box plot shows that higher price levels are generally associated with higher average ratings. Higher-priced restaurants appear to have more concentrated ratings than lower-priced restaurants, although it should be noted that there are fewer restaurants at the higher price levels.
 
 <iframe
   src="assets/bivariate_price_level_avg_rating.html"
@@ -94,7 +94,7 @@ The box plot shows that higher price levels are generally associated with higher
 </iframe>
 
 ### Aggregates
-This pivot table aggregates the data by naming feature and displays the mean `avg_rating` and `price`. While the "Hawaiian" word type corresponds with the highest average rating, "Dining Type" and "Hawaiian" names have the highest average prices. However, the difference between the naming features are relatively small.
+This pivot table aggregates the data by naming feature and displays the mean `avg_rating` and `price`. While the "Hawaiian" word type corresponds with the highest average rating, "Dining Type" and "Hawaiian" names have the highest average prices. However, the differences between the naming features are relatively small.
 
 | word_type | avg_rating | price |
 |---|---:|---:|
@@ -146,7 +146,7 @@ The missingness of `price` was tested to determine whether it depends on `longit
 
 **Test Statistic:** The absolute difference in mean longitude between restaurants with and without missing prices.
 
-**Significance Level:**: 0.05
+**Significance Level:** 0.05
 
 A second permutation test was conducted using the same method described above, but with respect to `longitude`. The resulting **p-value** was **0.462**.
 
@@ -186,10 +186,10 @@ At the time of prediction, the restaurant's name, price level, number of reviews
 ## Baseline Model
 The baseline model uses a linear regression model that predicts a restaurant's average rating using `price`, `num_of_reviews`, and `has_hawaiian_word`.
 
-The model achieved an **RMSE** of approximately **0.456**, meaning that its predicted ratings are typically about 0.456 points away from the actual ratings. Since the performance was measured based on a test set, it reflects how well the model generalizes to unseen data. This model is reasonably effective but still limited because it uses only three relatively simple features and assumes a linear relationship with average rating.
+The model achieved an **RMSE** of approximately **0.456**, meaning that its predicted ratings are typically about 0.456 points away from the actual ratings. Since the performance was measured based on a test set, it reflects how well the model generalizes to unseen data. This model provides a useful baseline but is limited because it uses only three relatively simple features and assumes a linear relationship with average rating.
 
 ## Final Model
-The final model builds on the baseline with the following features:
+In addition to the baseline features, the final model adds `has_cuisine_word`, `is_fast_food`, `is_fine_dining`, `price_fast_food`, `price_fine_dining`, and `category_count`. The following describes all features used: 
 
 `price`
 This feature represents a restaurant's price level, **ordinally encoded** from `$`-`$$$$` to 1-4. As shown in the bivariate box plot, higher price levels generally correspond with higher average ratings. Intuitively, price can reflect differences in restaurant positioning, service quality, and customer expectations, all of which may relate to how customers evaluate the restaurant.
@@ -219,7 +219,7 @@ The final model uses a **Random Forest Regressor** instead of linear regression.
 
 > Final Search Ranges
 
-`model__max_depth`: [4, 5, 6]  
+`model__max_depth`: [5, 6, 7]  
 `model__min_samples_leaf`: [4, 6, 8, 10]
 
 These ranges were refined through several trials. Broader ranges were initially tested, then narrowed around the values that performed best to compare nearby values more closely. `GridSearchCV` then evaluated each combination using cross-validation and selected the parameters with the lowest RMSE.
@@ -227,10 +227,10 @@ These ranges were refined through several trials. Broader ranges were initially 
 > Best Performing Parameters
 
 `max_depth` = 6  
-`min_samples_leaf` = 8
+`min_samples_leaf` = 6
 
 ### Performance Results
-On the same test data as the baseline model, the Random Forest model achieved an **RMSE** of approximately **0.425**, which, compared to the baseline model, **improved** by **0.031**. Since lower RMSE indicates predictions closer to the actual average ratings, this decrease shows that the final model performs better on unseen restaurants. The improvement suggests that the additional features, along with the Random Forest model's ability to account for nonlinear patterns and interactions, provide more useful predictive information. However, the RMSE remains relatively high, meaning that the model still has substantial room for improvement and does not predict individual ratings precisely.
+On the same test data as the baseline model, the Random Forest model achieved an **RMSE** of approximately **0.425**, which, compared to the baseline model, **improved** by **0.031**. Average ratings are measured on a **1-5** scale, so it can be interpreted that the predictions typically differ from the actual ratings by roughly 0.425 points. Since lower RMSE indicates predictions closer to the actual average ratings, this decrease shows that the final model performs better on unseen restaurants. The improvement suggests that the additional features, along with the Random Forest model's ability to account for nonlinear patterns and interactions, provide more useful predictive information.
 
 ## Fairness Analysis
 **Group X:** Restaurants with fewer than the median of 106 reviews.  
@@ -244,9 +244,9 @@ On the same test data as the baseline model, the Random Forest model achieved an
 
 **Significance Level:** 0.05
 
-Using the **RMSE** as the **evaluation metric**, which measures the size of prediction errors for a continuous response variable, the two groups were compared to determine whether the model predicts ratings less accurately for restaurants with fewer reviews. 
+Using **RMSE** as the **evaluation metric**, **prediction error partity** was assessed by comparing whether the model's RMSE across the two groups to determine whether it predicts ratings less accurately for restaurants with fewer reviews.
 
-A permutation test was conducted by shuffling the group labels 1000 times and comparing the simulated differenes in RMSE to the observed difference. The resulting **p-value** was less than **0.001**. 
+A permutation test was conducted by shuffling the group labels 1000 times and comparing the simulated differences in RMSE to the observed difference. The resulting **p-value** was less than **0.001**. 
 
 <iframe
   src="assets/empirical_distribution_rmse.html"
