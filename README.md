@@ -31,13 +31,13 @@ The following dataset was originally scraped and used in the research papers [UC
 
 ## Data Cleaning and Exploratory Data Analysis
 1. Keep only relevant columns from the metadata
-    - We only keep the columns relevant to the research question, which include `name`, `category`, `longitude`, `price`, `avg_rating`, and `num_of_reviews`.
+    - We kept only the columns relevant to the research question, which include `name`, `category`, `longitude`, `price`, `avg_rating`, and `num_of_reviews`.
 2. Remove rows missing necessary information
     - Rows missing `name`, `category`, or `avg_rating` were removed because these columns are necessary for identifying restaurants and analyzing their naming features and ratings.
 3. Convert `price` into numeric price levels
     - The original `price` column uses dollar signs such as `$`, `$$`, `$$$`, and `$$$$`. These were converted to numeric levels 1 through 4 so price can be more easily compared and analyzed. Missing prices were kept as `NaN`. 
 4. Filter the dataset to restaurants only
-    - Since we are only analyzing the restaurant business, we only keep rows where at least one category contains the word `restaurant`. 
+    - Since we are only analyzing the restaurant business, we kept only rows where at least one category contains the word `restaurant`. 
 5. Clean and split restaurant names into individual words
     - Restaurant names were converted to lowercase and cleaned by removing punctuation and special characters. A new column, `name_words`, was then created to store the individual words in each restaurant name.
 6. Create groups of naming features
@@ -121,7 +121,7 @@ The missingness of `price` was tested to determine whether it depends on `num_of
 
 **Test Statistic:** The absolute difference in mean number of reviews between restaurants with and without missing prices.
 
-**Significance Level:**: 0.05
+**Significance Level:** 0.05
 
 <iframe
   src="assets/missingness_dependent_price.html"
@@ -184,24 +184,24 @@ The model is evaluated using **RMSE** (Root Mean Squared Error) because it measu
 At the time of prediction, the restaurant's name, price level, number of reviews, and category information would already be available from its Google Maps listing. The naming features are derived only from the restaurant name, so they would also be known before prediction, making all selected features appropriate for training the model.
 
 ## Baseline Model
-The baseline model uses a linear regression model that predicts a restaurant's average rating using `price`, `num_of_reviews`, and `has_hawaiian_word`.
-
-The model achieved an **RMSE** of approximately **0.456**, meaning that its predicted ratings are typically about 0.456 points away from the actual ratings. Since the performance was measured based on a test set, it reflects how well the model generalizes to unseen data. This model provides a useful baseline but is limited because it uses only three relatively simple features and assumes a linear relationship with average rating.
-
-## Final Model
-In addition to the baseline features, the final model adds `has_cuisine_word`, `is_fast_food`, `is_fine_dining`, `price_fast_food`, `price_fine_dining`, and `category_count`. The following describes all features used: 
+The baseline model uses a linear regression model that predicts a restaurant's average rating using the following features:
 
 `price`
 This feature represents a restaurant's price level, **ordinally encoded** from `$`-`$$$$` to 1-4. As shown in the bivariate box plot, higher price levels generally correspond with higher average ratings. Intuitively, price can reflect differences in restaurant positioning, service quality, and customer expectations, all of which may relate to how customers evaluate the restaurant.
 
 `num_of_reviews`
-This feature represents how many reviews a restaurant has received. A larger review count can indicate greater popularity or visibility and may produce a more stable and reliable average rating because it is based on more customer experiences. It can also make a restaurant appear more established or trustworthy to potential customers, influencing their expectations and perceptions.
+This **quantitative** feature represents how many reviews a restaurant has received. A larger review count can indicate greater popularity or visibility and may produce a more stable and reliable average rating because it is based on more customer experiences. It can also make a restaurant appear more established or trustworthy to potential customers, influencing their expectations and perceptions.
 
 `has_hawaiian_word`
-This feature indicates whether the restaurant name contains a Hawaiian word. Since the analysis focuses on naming patterns in Hawaii, this variable captures a locally relevant aspect of restaurant identity that may be associated with how the restaurant is positioned and perceived by customers.
+This **binary nominal** feature indicates whether the restaurant name contains a Hawaiian word. Since the analysis focuses on naming patterns in Hawaii, this variable captures a locally relevant aspect of restaurant identity that may be associated with how the restaurant is positioned and perceived by customers.
+
+The model achieved an **RMSE** of approximately **0.456**, meaning that its predicted ratings are typically about 0.456 points away from the actual ratings. Since the performance was measured based on a test set, it reflects how well the model generalizes to unseen data. This model provides a useful baseline but is limited because it uses only three relatively simple features and assumes a linear relationship with average rating.
+
+## Final Model
+In addition to the baseline features, the final model adds the following engineered features:
 
 `has_cuisine_word`
-This feature indicates whether a restaurant name contains a cuisine-related word, such as "Thai" or "Hawaiian", both of which appear among the top 20 most common words in the univariate analysis. Cuisine can shape expectations around food, pricing, and a more stylized dining environment, which may influence how customers evaluate and rate a restaurant.
+This **binary nominal** feature indicates whether a restaurant name contains a cuisine-related word, such as "Thai" or "Hawaiian", both of which appear among the top 20 most common words in the univariate analysis. Cuisine can shape expectations around food, pricing, and a more stylized dining environment, which may influence how customers evaluate and rate a restaurant.
 
 `is_fast_food` and `is_fine_dining`
 These two features were derived from the `category` column in the original dataset as **binary indicators** of whether a business is classified as a "Fast Food Restaurant" or "Fine Dining Restaurant". This helps distinguish restaurants with different dining styles, service expectations, and price ranges, which may shape customer experiences and therefore ratings. 
@@ -210,7 +210,7 @@ These two features were derived from the `category` column in the original datas
 These two engineered **interaction terms** combine price level with restaurant type. This is useful because fine dining and fast food operate within very different price ranges, so the same price level may carry a different meaning depending on the type of restaurant. Although Random Forest can learn interactions on its own, explicitly including these terms gives the model direct information about price within each dining context.
 
 `category_count`
-This feature represents the number of categories assigned to a restaurant on Google Maps. Restaurants with more categories may offer a broader range of services or fall into multiple dining classifications. For instance, a less specialized restaurant may be represented by several categories rather than one specific type, giving the model additional context. 
+This **quantitative** feature represents the number of categories assigned to a restaurant on Google Maps. Restaurants with more categories may offer a broader range of services or fall into multiple dining classifications. For instance, a less specialized restaurant may be represented by several categories rather than one specific type, giving the model additional context. 
 
 ### Model and Hyperparameter Selection
 The final model uses a **Random Forest Regressor** instead of linear regression. Linear regression assumes that the relationship between each feature and average rating is approximately linear, which may be too restrictive for this data. Random Forest was chosen because it can capture nonlinear relationships and interactions between features, allowing it to learn more complex patterns in the data.
@@ -236,7 +236,7 @@ On the same test data as the baseline model, the Random Forest model achieved an
 **Group X:** Restaurants with fewer than the median of 106 reviews.  
 **Group Y:** Restaurants with at least the median of 106 reviews.
 
-**Null Hypothesis:** The model is fair. Its RMSE for restaurants with fewer reviews and restaurants with more reviews is roughly the same, and any observed differences is due to random chance.
+**Null Hypothesis:** The model is fair. Its RMSE for restaurants with fewer reviews and restaurants with more reviews is roughly the same, and any observed difference is due to random chance.
 
 **Alternative Hypothesis:** The model is unfair. Its RMSE for restaurants with fewer reviews is higher than its RMSE for restaurants with more reviews.
 
@@ -244,7 +244,7 @@ On the same test data as the baseline model, the Random Forest model achieved an
 
 **Significance Level:** 0.05
 
-Using **RMSE** as the **evaluation metric**, **prediction error partity** was assessed by comparing whether the model's RMSE across the two groups to determine whether it predicts ratings less accurately for restaurants with fewer reviews.
+Using **RMSE** as the **evaluation metric**, **prediction error parity** was assessed by comparing the model's RMSE across the two groups to determine whether it predicts ratings less accurately for restaurants with fewer reviews.
 
 A permutation test was conducted by shuffling the group labels 1000 times and comparing the simulated differences in RMSE to the observed difference. The resulting **p-value** was less than **0.001**. 
 
