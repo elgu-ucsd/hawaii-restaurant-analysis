@@ -37,11 +37,11 @@ The following dataset was originally scraped and used in the research papers [UC
 3. Convert `price` into numeric price levels
     - The original `price` column uses dollar signs such as `$`, `$$`, `$$$`, and `$$$$`. These were converted to numeric levels 1 through 4 so price can be more easily compared and analyzed. Missing prices were kept as `NaN`. 
 4. Filter the dataset to restaurants only
-    - Since we are only analyzing the restaurant business, we kept only rows where at least one category contains the word `restaurant`. 
+    - Since we are only analyzing restaurants, we kept only rows where at least one category contains the word `restaurant`. 
 5. Clean and split restaurant names into individual words
     - Restaurant names were converted to lowercase and cleaned by removing punctuation and special characters. A new column, `name_words`, was then created to store the individual words in each restaurant name.
 6. Create groups of naming features
-    - Words were grouped into categories including food, cuisine, dining type, Hawaiian words, descriptive words, and person names. These groups make it easier to compare variables across broader naming patterns rather than individual words.
+    - Words were grouped into categories including food, cuisine, dining type, Hawaiian words, descriptive words, and person names. These groups make it easier to compare variables across broader naming patterns rather than individual words. However, because the categories were manually defined, they are subjective and not exhaustive, meaning some restaurants may not fall into any of the created categories.
 7. Add boolean columns for each naming feature
     - The columns `has_food_word`, `has_cuisine_word`, `has_dining_type_word`, `has_hawaiian_word`, `has_descriptive_word`, and `has_person_name` were added to indicate whether a restaurant name contains a word from each category. 
 
@@ -65,7 +65,7 @@ The distribution of the most common words in restaurant names shows that terms s
   frameborder="0">
 </iframe>
 
-The distribution of word types in restaurant names shows that `has_food_word` and `has_dining_type_word` are the most common naming features. However, it is important to note that because these categories are manually defined, this plot should be interpreted broadly and only as a general classification of naming patterns rather than a precise or exhaustive measure.
+The distribution of word types in restaurant names shows that `has_food_word` and `has_dining_type_word` are the most common naming features. This suggests that restaurants are more likely to use names that directly communicate the food they serve or the type of establishment. 
 
 <iframe
   src="assets/univariate_distribution_of_word_types.html"
@@ -153,7 +153,7 @@ A second permutation test was conducted using the same method described above, b
 Since the p-value is greater than the significance level of 0.05, we **fail to reject the null hypothesis**. This suggests that the missingness of `price` does not depend on `longitude`. In other words, a restaurant's east-west geographic position does not appear to explain why `price` is missing. 
 
 ## Hypothesis Testing
-We are interested in whether the presence of Hawaiian words in restaurant names is associated with higher average price levels. This directly addresses the main research question by examining one distinct naming feature. A permutation test is conducted to evaluate this relationship.
+We are interested in whether the presence of Hawaiian words in restaurant names is associated with higher average price levels. This directly addresses the main research question by examining one distinct naming feature. A permutation test was conducted to evaluate this relationship.
 
 **Null Hypothesis:** Restaurants with Hawaiian words in their names have the same average price level as restaurants without Hawaiian words in their names.
 
