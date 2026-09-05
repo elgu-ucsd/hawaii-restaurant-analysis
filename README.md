@@ -244,7 +244,7 @@ On the same test data as the baseline model, the Random Forest model achieved an
 
 **Significance Level:** 0.05
 
-Using **RMSE** as the **evaluation metric**, **prediction error parity** was assessed by comparing the model's RMSE across the two groups to determine whether it predicts ratings less accurately for restaurants with fewer reviews.
+Using **RMSE** as the **evaluation metric**, the model's prediction errors were compared across the two groups to determine whether it predicts ratings less accurately for restaurants with fewer reviews.
 
 A permutation test was conducted by shuffling the group labels 1000 times and comparing the simulated differences in RMSE to the observed difference. The resulting **p-value** was less than **0.001**. 
 
